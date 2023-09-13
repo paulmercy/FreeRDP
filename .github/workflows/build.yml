@@ -3,38 +3,42 @@ name: Build FreeRDP DLLs
 on:
   push:
     branches:
-        - master
-  pull_request:
+      - master
 
 jobs:
   build:
     runs-on: windows-latest
-
     steps:
-    - name: Checkout FreeRDP
-      run: |
-        git clone https://github.com/FreeRDP/FreeRDP.git
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Checkout dependencies
-      run: |
-        cd FreeRDP
-        git clone https://github.com/cisco/openh264.git
+      - name: Install MSYS2
+        run: |
+          choco install msys2 -y
+          choco install make -y
 
-    - name: Build OpenSSL
-      run: |
-        cd openssl
-        ./Configure mingw64 --cross-compile-prefix=x86_64-w64-mingw32- --prefix=<your install path>
-        make -j build_sw
-        make -j install_sw
+      - name: Initialize MSYS2
+        run: |
+          # Set environment variables for MSYS2
+          echo ::set-env name=MSYS2_PATH::C:\tools\msys64
+          echo ::add-path::C:\tools\msys64\usr\bin
 
-    - name: Build FreeRDP
-      run: |
-        cd FreeRDP
-        # Add necessary build commands and options for FreeRDP
+          # Initialize MSYS2
+          C:\tools\msys64\msys2_shell.cmd -no-start -defterm -here -msys
 
-    - name: Upload artifacts
-      uses: actions/upload-artifact@v2
-      with:
-        name: freerdp-artifacts
-        path: artifacts/
+      - name: Install FreeRDP dependencies
+        run: |
+          pacman -Sy --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc
 
+      - name: Build FreeRDP
+        run: |
+          mkdir build
+          cd build
+          cmake -G "MSYS Makefiles" ..
+          make
+
+      - name: Create artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: FreeRDP DLLs for Windows x64
+          path: build/
