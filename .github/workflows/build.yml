@@ -26,6 +26,11 @@ jobs:
           # Initialize MSYS2
           C:\tools\msys64\msys2_shell.cmd -no-start -defterm -here -msys
 
+      - name: Update MSYS2
+        run: |
+            # Update MSYS2 packages (sync the package databases)
+            pacman -Syu --noconfirm
+
       - name: Install FreeRDP dependencies
         run: |
           pacman -Sy --noconfirm mingw-w64-x86_64-pkg-config mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc
