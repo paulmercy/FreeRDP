@@ -20,8 +20,8 @@ jobs:
       - name: Initialize MSYS2
         run: |
           # Set environment variables for MSYS2
-          echo ::set-env name=MSYS2_PATH::C:\tools\msys64
-          echo ::add-path::C:\tools\msys64\usr\bin
+          echo "MSYS2_PATH=C:\tools\msys64" >> $GITHUB_ENV
+          echo "PATH=$GITHUB_WORKSPACE/C:/tools/msys64/usr/bin:$PATH" >> $GITHUB_ENV
 
           # Initialize MSYS2
           C:\tools\msys64\msys2_shell.cmd -no-start -defterm -here -msys
