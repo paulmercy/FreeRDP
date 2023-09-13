@@ -18,8 +18,7 @@ jobs:
     - name: Checkout dependencies
       run: |
         cd FreeRDP
-        git clone https://github.com/cisco/openh264.git -b<branch|tag>
-        git clone https://github.com/openssl/openssl.git -b<branch|tag>
+        git clone https://github.com/cisco/openh264.git
 
     - name: Build OpenSSL
       run: |
