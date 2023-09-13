@@ -3,38 +3,39 @@ name: Build FreeRDP DLLs
 on:
   push:
     branches:
-      - master
+        - master
+  pull_request:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-
-    - name: Install Chocolatey
+    - name: Checkout FreeRDP
       run: |
-        Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
+        git clone https://github.com/FreeRDP/FreeRDP.git
 
-    - name: Install dependencies
+    - name: Checkout dependencies
       run: |
-        choco install -y cmake ninja
+        cd FreeRDP
+        git clone https://github.com/cisco/openh264.git -b<branch|tag>
+        git clone https://github.com/openssl/openssl.git -b<branch|tag>
+
+    - name: Build OpenSSL
+      run: |
+        cd openssl
+        ./Configure mingw64 --cross-compile-prefix=x86_64-w64-mingw32- --prefix=<your install path>
+        make -j build_sw
+        make -j install_sw
 
     - name: Build FreeRDP
       run: |
-        mkdir build
-        cd build
-        cmake -G "Ninja" -DWITH_WINSSPI=ON -DWITH_WINPR=ON -DWITH_GSSAPI=OFF -DWITH_SMARTCARD=OFF -DWITH_ICONV=OFF -DWITH_DEBUG=OFF -DWITH_CLIENT_CORE=ON -DWITH_SERVER_CHANNELS=ON -DWITH_CLIENT_CHANNELS=ON -DWITH_STATIC_LIB=ON -DWITH_SHARED_LIB=OFF ..
-        ninja
+        cd FreeRDP
+        # Add necessary build commands and options for FreeRDP
 
-    - name: Create artifact
-      run: |
-        mkdir artifacts
-        cp build/libfreerdp.dll artifacts/
-
-    - name: Upload artifact
+    - name: Upload artifacts
       uses: actions/upload-artifact@v2
       with:
-        name: freerdp-windows-x64
+        name: freerdp-artifacts
         path: artifacts/
+
