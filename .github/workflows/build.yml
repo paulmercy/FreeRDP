@@ -3,7 +3,7 @@ name: Build FreeRDP DLLs
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -19,14 +19,14 @@ jobs:
 
     - name: Install dependencies
       run: |
-        choco install -y make cmake
+        choco install -y cmake ninja
 
     - name: Build FreeRDP
       run: |
         mkdir build
         cd build
-        cmake -DWITH_WINSSPI=ON -DWITH_WINPR=ON -DWITH_GSSAPI=OFF -DWITH_SMARTCARD=OFF -DWITH_ICONV=OFF -DWITH_DEBUG=OFF -DWITH_CLIENT_CORE=ON -DWITH_SERVER_CHANNELS=ON -DWITH_CLIENT_CHANNELS=ON -DWITH_STATIC_LIB=ON -DWITH_SHARED_LIB=OFF -G "MSYS Makefiles" ..
-        mingw32-make
+        cmake -G "Ninja" -DWITH_WINSSPI=ON -DWITH_WINPR=ON -DWITH_GSSAPI=OFF -DWITH_SMARTCARD=OFF -DWITH_ICONV=OFF -DWITH_DEBUG=OFF -DWITH_CLIENT_CORE=ON -DWITH_SERVER_CHANNELS=ON -DWITH_CLIENT_CHANNELS=ON -DWITH_STATIC_LIB=ON -DWITH_SHARED_LIB=OFF ..
+        ninja
 
     - name: Create artifact
       run: |
