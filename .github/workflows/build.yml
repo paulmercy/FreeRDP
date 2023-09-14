@@ -3,9 +3,6 @@ on:
   push:
     branches:
       - master
-  pull_request:
-    branches:
-      - master
 
 jobs:
   build:
@@ -30,8 +27,12 @@ jobs:
           Start-Process -Wait -FilePath .\Win64OpenSSL-1_1_1l.exe -ArgumentList '/SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\OpenSSL"'
           Remove-Item .\Win64OpenSSL-1_1_1l.exe
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1
+      - name: Setup MSBuild.exe
+        uses: warrenbuckley/Setup-MSBuild@v1
+
+      - name: MSBuild
+        working-directory: src
+        run: msbuild MyProject.csproj
 
       - name: Build DLLs
         run: |
