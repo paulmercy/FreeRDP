@@ -13,26 +13,21 @@ jobs:
       uses: actions/checkout@v2
 
     - name: Install Packages
-      run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
-    
-    - name: Install FFmpeg dependencies using pkg-config
-      run:  install libavutil-dev libavcodec-dev libavresample-dev
+      run: |
+        choco install cmake openssl git
+        choco install visualstudio2019buildtools --package-parameters "--add Microsoft.VisualStudio.Component.VC.Tools.x86.x64"
 
-
-    - name: Set Environment Variables
-      run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
-
-    - name: Create Build Directory
-      run: mkdir ${{ github.workspace }}/build
+    - name: Clone FreeRDP Source
+      run: git clone https://github.com/FreeRDP/FreeRDP.git
 
     - name: Build FreeRDP
       run: |
-        cd ${{ github.workspace }}
-        cmake -GNinja -DCHANNEL_URBDRC=OFF -DWITH_DSP_FFMPEG=ON -DBUILD_SHARED_LIBS=OFF -Bbuild -S .
-        cmake --build build --target install
+        cd FreeRDP
+        cmake -DBUILD_SHARED_LIBS=OFF -DOPENSSL_ROOT_DIR=C:/ProgramData/chocolatey/lib/openssl/local/ssl -G"Visual Studio 16 2019" -A x64 .
+        cmake --build . --config Release
 
     - name: Archive Artifacts
       uses: actions/upload-artifact@v2
       with:
         name: build_artifacts
-        path: ${{ github.workspace }}/install/
+        path: FreeRDP/
