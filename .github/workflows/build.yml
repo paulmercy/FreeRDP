@@ -31,12 +31,12 @@ jobs:
 
       - name: Configure FreeRDP Build
         run: cmake . -G "Visual Studio 11 Win64"
-        working-directory: FreeRDP
+    
     
 
       - name: Build FreeRDP
         run: msbuild FreeRDP.sln /p:Configuration=Release /p:Platform=x64
-        working-directory: path/to/FreeRDP
+     
         
 
       - name: Archive artifacts
