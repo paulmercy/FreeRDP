@@ -32,7 +32,7 @@ jobs:
       - name: Build FreeRDP
         run: |
             cd ${{ github.workspace }}
-            cmake -GNinja -DCHANNEL_URBDRC=OFF -DWITH_DSP_FFMPEG=ON -DBUILD_SHARED_LIBS=OFF -Bbuild -S .
+            cmake -DCHANNEL_URBDRC=OFF -DWITH_DSP_FFMPEG=ON -DBUILD_SHARED_LIBS=OFF -Bbuild -S .
             cmake --build build --target install
         
 
