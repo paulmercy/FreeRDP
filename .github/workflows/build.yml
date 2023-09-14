@@ -16,7 +16,7 @@ jobs:
       run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
     
     - name: Install FFmpeg dependencies using pkg-config
-      run:  sudo apt-get install libavutil-dev libavcodec-dev libavresample-dev
+      run:  install libavutil-dev libavcodec-dev libavresample-dev
 
 
     - name: Set Environment Variables
