@@ -1,33 +1,36 @@
-name: Build FreeRDP DLLs
+name: Build FreeRDP
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up MSVC environment
-        uses: microsoft/setup-msbuild@v1
-        
-      - name: List directory contents
-        run: ls
-   
-      - name: Build FreeRDP DLLs
+      - name: Install dependencies
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          cmake --build .
+          git clone -b openssl-3.1.1 https://github.com/openssl/openssl.git
+          cd openssl
+          ./Configure mingw64 --cross-compile-prefix=x86_64-w64-mingw32- --prefix=<your install path>
+          make -j build_sw
+          make -j install_sw
 
-      - name: Publish artifact
+      - name: Build FreeRDP
+        run: |
+          git clone https://github.com/FreeRDP/FreeRDP.git
+          cd FreeRDP
+          cmake -B build -S .
+          cmake --build build --config Release
+
+      - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
-          name: freerdp-dlls
-          path: FreeRDP/build
+          name: FreeRDP DLLs
+          path: FreeRDP/build/bin/Release
