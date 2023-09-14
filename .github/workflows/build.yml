@@ -15,16 +15,27 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up MSVC environment
-        uses: microsoft/setup-msbuild@v1
-
-      - name: Build FreeRDP
-        run: |
-          MSBuild /p:Configuration=Release /p:Platform=x64
-          # Additional build commands if needed
-
-      - name: Create artifact
-        uses: actions/upload-artifact@v2
+      - name: Set up MSVC 2012
+        uses: actions/setup-msbuild@v1
         with:
-          name: FreeRDP DLLs
-          path: FreeRDP/build/bin/Release
+          vs-version: 2012
+          architecture: x64
+
+      - name: Clone repository
+        uses: actions/checkout@v2
+
+      - name: Install OpenSSL
+        run: |
+          curl -LO https://slproweb.com/download/Win64OpenSSL-1_1_1l.exe
+          Start-Process -Wait -FilePath .\Win64OpenSSL-1_1_1l.exe -ArgumentList '/SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\OpenSSL"'
+          Remove-Item .\Win64OpenSSL-1_1_1l.exe
+
+      - name: Install CMake
+        uses: kitware/setup-cmake@v1
+
+      - name: Build DLLs
+        run: |
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build .
