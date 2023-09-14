@@ -1,4 +1,5 @@
-name: Build FreeRDP DLLs
+name: Build FreeRDP
+
 on:
   push:
     branches:
@@ -9,41 +10,32 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code pass
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Set up MSVC 2012
-        uses: actions/setup-msbuild@v1
-        with:
-          vs-version: 2012
-          architecture: x64
-
-      - name: Clone repository
-        uses: actions/checkout@v2
+      - name: Set up MSVC
+        uses: microsoft/setup-msvc@v1.0.2
 
       - name: Install OpenSSL
         run: |
-          curl -LO https://slproweb.com/download/Win64OpenSSL-1_1_1l.exe
-          Start-Process -Wait -FilePath .\Win64OpenSSL-1_1_1l.exe -ArgumentList '/SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\OpenSSL"'
-          Remove-Item .\Win64OpenSSL-1_1_1l.exe
+          curl -LO https://slproweb.com/download/Win64OpenSSL_Light-1_1_1l.exe
+          Start-Process -Wait -FilePath .\Win64OpenSSL_Light-1_1_1l.exe -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /DIR=C:\OpenSSL"
+          Remove-Item .\Win64OpenSSL_Light-1_1_1l.exe
 
-      - name: Setup MSBuild.exe
-        uses: warrenbuckley/Setup-MSBuild@v1
-
-      - name: MSBuild
-        working-directory: src
-        run: msbuild MyProject.csproj
-
-      - name: Build DLLs
+      - name: Install CMake
         run: |
-          mkdir build
-          cd build
-          cmake ..
-          cmake --build .
+          curl -LO https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-windows-x86_64.zip
+          Expand-Archive -Path .\cmake-3.21.3-windows-x86_64.zip -DestinationPath C:\CMake
+          Remove-Item .\cmake-3.21.3-windows-x86_64.zip
 
-      - name: Upload artifacts
+      - name: Build FreeRDP
+        run: |
+          cd FreeRDP
+          cmake -B build .
+          cmake --build build --config Release
+
+      - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
-            name: DLLs
-            path: build
-  
+          name: FreeRDP DLLs
+          path: FreeRDP/build
