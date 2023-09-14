@@ -15,10 +15,12 @@ jobs:
 
       - name: Set up MSVC environment
         uses: microsoft/setup-msbuild@v1
-
+        
+      - name: List directory contents
+        run: ls
+   
       - name: Build FreeRDP DLLs
         run: |
-          cd FreeRDP
           mkdir build
           cd build
           cmake ..
