@@ -12,7 +12,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout code pass
         uses: actions/checkout@v2
 
       - name: Set up MSVC 2012
