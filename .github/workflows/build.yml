@@ -29,17 +29,18 @@ jobs:
           Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList "/i cmake.msi /quiet"
           Remove-Item cmake.msi
 
-
-      - name: Clean and Rebuild
-        run: |
-            msbuild FreeRDP.sln /t:Clean
-            msbuild FreeRDP.sln /t:Build /p:Configuration=Release /p:Platform=x64
- 
       - name: Configure FreeRDP Build
-        run: cmake . -G "Visual Studio 11 Win64"        
+        run: cmake . -G "Visual Studio 16 2019" -A x64
+        working-directory: FreeRDP
+    
+
+      - name: Build FreeRDP
+        run: msbuild FreeRDP.sln /p:Configuration=Release /p:Platform=x64
+        working-directory: FreeRDP
+        
 
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
         with:
           name: FreeRDP-Artifact
-          path: build
+          path: FreeRDP/Release
