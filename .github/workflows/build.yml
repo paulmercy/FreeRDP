@@ -30,8 +30,8 @@ jobs:
           Start-Process -Wait -FilePath .\Win64OpenSSL-1_1_1l.exe -ArgumentList '/SP- /VERYSILENT /SUPPRESSMSGBOXES /DIR="C:\OpenSSL"'
           Remove-Item .\Win64OpenSSL-1_1_1l.exe
 
-      - name: Install CMake
-        uses: kitware/setup-cmake@v1
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1
 
       - name: Build DLLs
         run: |
@@ -39,3 +39,10 @@ jobs:
           cd build
           cmake ..
           cmake --build .
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v2
+        with:
+            name: DLLs
+            path: build
+  
