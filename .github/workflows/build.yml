@@ -1,7 +1,9 @@
 name: Build FreeRDP
-
 on:
   push:
+    branches:
+      - master
+  pull_request:
     branches:
       - master
 
@@ -13,31 +15,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Prepare MSVC
-        uses: bus1/cabuild/action/msdevshell@v1
-        with:
-          architecture: x64
+      - name: Set up MSVC
+        uses: microsoft/setup-msbuild@v1
 
       - name: Install OpenSSL
         run: |
-          curl -LO https://slproweb.com/download/Win64OpenSSL_Light-1_1_1l.exe
-          Start-Process -Wait -FilePath .\Win64OpenSSL_Light-1_1_1l.exe -ArgumentList "/VERYSILENT /SUPPRESSMSGBOXES /DIR=C:\OpenSSL"
-          Remove-Item .\Win64OpenSSL_Light-1_1_1l.exe
+          curl -LO https://slproweb.com/download/Win64OpenSSL-1_1_1k.exe
+          Start-Process -Wait -FilePath .\Win64OpenSSL-1_1_1k.exe -ArgumentList "/silent /verysilent /sp- /suppressmsgboxes /DIR=C:\OpenSSL"
+          Remove-Item -Force .\Win64OpenSSL-1_1_1k.exe
 
       - name: Install CMake
         run: |
-          curl -LO https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-windows-x86_64.zip
-          Expand-Archive -Path .\cmake-3.21.3-windows-x86_64.zip -DestinationPath C:\CMake
-          Remove-Item .\cmake-3.21.3-windows-x86_64.zip
+          curl -LO https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-win64-x64.zip
+          Expand-Archive -Path .\cmake-3.21.3-win64-x64.zip -DestinationPath C:\CMake
+          Remove-Item -Force .\cmake-3.21.3-win64-x64.zip
 
       - name: Build FreeRDP
         run: |
           cd FreeRDP
-          cmake -B build .
-          cmake --build build --config Release
+          mkdir build
+          cd build
+          cmake ..
+          cmake --build . --config Release
 
       - name: Create artifact
         uses: actions/upload-artifact@v2
         with:
           name: FreeRDP DLLs
-          path: FreeRDP/build
+          path: FreeRDP/build/bin
