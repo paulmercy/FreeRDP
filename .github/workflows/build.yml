@@ -31,10 +31,9 @@ jobs:
 
       - name: Build FreeRDP
         run: |
-          mkdir build
-          cd build
           cmake . -G"Visual Studio 11 Win64"
           cmake --build . --config Release
+
 
       - name: Archive artifacts
         uses: actions/upload-artifact@v2
