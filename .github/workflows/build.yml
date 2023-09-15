@@ -21,7 +21,6 @@ jobs:
           curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-1_1_1L.exe
           Start-Process -Wait -NoNewWindow -FilePath openssl.exe -ArgumentList "/silent /sp- /suppressmsgboxes /DIR=C:\OpenSSL-Win64"
           Remove-Item openssl.exe
-        shell: powershell
 
       - name: Install CMake
         run: |
