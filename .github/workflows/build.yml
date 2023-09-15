@@ -17,7 +17,7 @@ jobs:
         uses: ilammy/msvc-dev-cmd@v1
 
       - name: Install Packages
-        run: choco install cmake ninja zlib openssl ffmpeg nasm strawberryperl --ignore-reboot
+        run: choco install cmake ninja zlib1g openssl ffmpeg nasm strawberryperl --ignore-reboot
   
       - name: Set Environment Variables
         run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
