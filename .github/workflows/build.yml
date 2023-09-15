@@ -1,8 +1,9 @@
-name: Build FreeRDP DLLs
+name: Build FreeRDP for Windows x64
+
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -12,30 +13,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install MSVC
+      - name: Set up MSVC 2012
         uses: ilammy/msvc-dev-cmd@v1
-        with:
-          architecture: x64
 
+      - name: Install OpenSSL
+        run: |
+          # You may need to update the OpenSSL download link
+          Invoke-WebRequest -Uri 'https://slproweb.com/download/Win64OpenSSL-1_1_1l.exe' -OutFile 'OpenSSL.exe'
+          Start-Process -Wait -FilePath '.\OpenSSL.exe' -ArgumentList @('/silent', '/SP-', '/VERYSILENT', '/NORESTART', '/NOCANCEL')
+          Remove-Item 'OpenSSL.exe'
+        shell: powershell
 
-      - name: Install Packages
-        run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
-    
-      - name: Set Environment Variables
-        run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
-          
-      - name: Create Build Directory
-        run: mkdir ${{ github.workspace }}/build
+      - name: Install CMake
+        run: |
+          # You may need to update the CMake download link
+          Invoke-WebRequest -Uri 'https://github.com/Kitware/CMake/releases/download/v3.21.2/cmake-3.21.2-win64-x64.zip' -OutFile 'cmake.zip'
+          Expand-Archive -Path 'cmake.zip' -DestinationPath 'C:\cmake' -Force
+          Remove-Item 'cmake.zip'
+          $env:PATH = 'C:\cmake\cmake-3.21.2-win64-x64\bin;' + $env:PATH
+        shell: powershell
 
       - name: Build FreeRDP
         run: |
-            cd ${{ github.workspace }}
-            cmake -DCHANNEL_URBDRC=OFF -DWITH_DSP_FFMPEG=ON -DBUILD_SHARED_LIBS=OFF -Bbuild -S .
-            cmake --build build --target install
-        
+          mkdir build
+          cd build
+          cmake .. -G "Visual Studio 11 Win64"
+          cmake --build . --config Release
+        shell: powershell
 
-      - name: Archive artifacts
+      - name: Create Artifact
+        run: |
+          mkdir artifacts
+          mv build/Release/*.dll artifacts/
+        shell: powershell
+
+      - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
-          name: FreeRDP-Artifact
-          path: FreeRDP/Release
+          name: FreeRDP-Windows-x64
+          path: artifacts/
