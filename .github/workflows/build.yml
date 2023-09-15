@@ -19,7 +19,7 @@ jobs:
         run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
 
       - name: Install Zlib
-        uses: madler/zlib
+        uses: madler/zlib@master
   
       - name: Set Environment Variables
         run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
