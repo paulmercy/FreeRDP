@@ -1,40 +1,34 @@
-name: Build FreeRDP for Windows x64
+name: Build FreeRDP on Windows
 
 on:
   push:
-    branches:
-      - master
+    branches: [ master ]
+
 jobs:
   build:
     runs-on: windows-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Set up MSVC 2012
-        uses: ilammy/msvc-dev-cmd@v1
+    - name: Install Packages
+      run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
 
-      - name: Install Packages
-        run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
+    - name: Set Environment Variables
+      run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
 
-      - name: Install Zlib
-        uses: madler/zlib@master
-  
-      - name: Set Environment Variables
-        run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
-  
-      - name: Create Build Directory
-        run: mkdir ${{ github.workspace }}/build
-  
-      - name: Build FreeRDP
-        run: |
-          cd ${{ github.workspace }}
-          cmake .
-          cmake --build build --target install
-  
-      - name: Archive Artifacts
-        uses: actions/upload-artifact@v2
-        with:
-          name: build_artifacts
-          path: ${{ github.workspace }}/install/
+    - name: Create Build Directory
+      run: mkdir ${{ github.workspace }}/build
+
+    - name: Build FreeRDP
+      run: |
+        cd ${{ github.workspace }}
+        cmake -GNinja -DCHANNEL_URBDRC=OFF -DWITH_DSP_FFMPEG=ON -DBUILD_SHARED_LIBS=OFF -Bbuild -S .
+        cmake --build build --target install
+
+    - name: Archive Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build_artifacts
+        path: ${{ github.workspace }}/install/
