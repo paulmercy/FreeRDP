@@ -12,8 +12,8 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Prepare MSVC
-        uses: bus1/cabuild/action/msdevshell@v1
+      - name: Install MSVC
+        uses: ilammy/msvc-dev-cmd@v1
         with:
           architecture: x64
 
