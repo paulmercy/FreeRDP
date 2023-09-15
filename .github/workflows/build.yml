@@ -28,6 +28,9 @@ jobs:
           curl -L -o cmake.msi https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-windows-x86_64.msi
           Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList "/i cmake.msi /quiet"
           Remove-Item cmake.msi
+          
+      - name: Create Build Directory
+        run: mkdir ${{ github.workspace }}/build
 
       - name: Build FreeRDP
         run: |
