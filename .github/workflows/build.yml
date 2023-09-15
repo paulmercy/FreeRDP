@@ -18,18 +18,16 @@ jobs:
 
       - name: Install OpenSSL
         run: |
-          # You may need to update the OpenSSL download link
-          Invoke-WebRequest -Uri 'https://slproweb.com/download/Win64OpenSSL-1_1_1l.exe' -OutFile 'OpenSSL.exe'
-          Start-Process -Wait -FilePath '.\OpenSSL.exe' -ArgumentList @('/silent', '/SP-', '/VERYSILENT', '/NORESTART', '/NOCANCEL')
-          Remove-Item 'OpenSSL.exe'
+          curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-1_1_1L.exe
+          Start-Process -Wait -NoNewWindow -FilePath openssl.exe -ArgumentList "/silent /sp- /suppressmsgboxes /DIR=C:\OpenSSL-Win64"
+          Remove-Item openssl.exe
         shell: powershell
 
       - name: Install CMake
         run: |
-          # You may need to update the CMake download link
-          Invoke-WebRequest -Uri 'https://github.com/Kitware/CMake/releases/download/v3.21.2/cmake-3.21.2-win64-x64.zip' -OutFile 'cmake.zip'
-          Expand-Archive -Path 'cmake.zip' -DestinationPath 'C:\cmake' -Force
-          Remove-Item 'cmake.zip'
+          curl -L -o cmake.msi https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-windows-x86_64.msi
+          Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList "/i cmake.msi /quiet"
+          Remove-Item cmake.msi
           $env:PATH = 'C:\cmake\cmake-3.21.2-win64-x64\bin;' + $env:PATH
         shell: powershell
 
