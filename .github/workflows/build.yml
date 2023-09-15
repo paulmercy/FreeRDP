@@ -16,35 +16,23 @@ jobs:
       - name: Set up MSVC 2012
         uses: ilammy/msvc-dev-cmd@v1
 
-      - name: Install OpenSSL
-        run: |
-          curl -L -o openssl.exe https://slproweb.com/download/Win64OpenSSL-1_1_1L.exe
-          Start-Process -Wait -NoNewWindow -FilePath openssl.exe -ArgumentList "/silent /sp- /suppressmsgboxes /DIR=C:\OpenSSL-Win64"
-          Remove-Item openssl.exe
-
-      - name: Install CMake
-        run: |
-          curl -L -o cmake.msi https://github.com/Kitware/CMake/releases/download/v3.21.3/cmake-3.21.3-windows-x86_64.msi
-          Start-Process -Wait -NoNewWindow -FilePath msiexec.exe -ArgumentList "/i cmake.msi /quiet"
-          Remove-Item cmake.msi
-
-
+      - name: Install Packages
+        run: choco install cmake ninja openssl ffmpeg nasm strawberryperl --ignore-reboot
+  
+      - name: Set Environment Variables
+        run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
+  
+      - name: Create Build Directory
+        run: mkdir ${{ github.workspace }}/build
+  
       - name: Build FreeRDP
         run: |
-          mkdir build
-          cd build
-          cmake .. -G "Visual Studio 11 Win64"
-          cmake --build . --config Release
-        shell: powershell
-
-      - name: Create Artifact
-        run: |
-          mkdir artifacts
-          mv build/Release/*.dll artifacts/
-        shell: powershell
-
-      - name: Upload Artifact
+          cd ${{ github.workspace }}
+          cmake .
+          cmake --build build --target install
+  
+      - name: Archive Artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: FreeRDP-Windows-x64
-          path: artifacts/
+          name: build_artifacts
+          path: ${{ github.workspace }}/install/
