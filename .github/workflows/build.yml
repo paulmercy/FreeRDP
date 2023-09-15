@@ -17,6 +17,11 @@ jobs:
 
     - name: Set Environment Variables
       run: echo "PKG_CONFIG_PATH=C:/ProgramData/chocolatey/lib/ffmpeg/tools/ffmpeg/share/pkgconfig" >> $GITHUB_ENV
+      
+    - name: Set Environment Variables
+      run: |
+        echo "PKG_CONFIG_PATH=C:/Strawberry/c/lib/pkgconfig" >> $GITHUB_ENV
+        echo "CMAKE_PREFIX_PATH=C:/Strawberry/c" >> $GITHUB_ENV
 
     - name: Create Build Directory
       run: mkdir ${{ github.workspace }}/build
